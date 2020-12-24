@@ -8,7 +8,7 @@ const {JWT_SECRET} = require('../keys')
 
 router.post('/signup', (req, res) => {
 
-    const {name, email, password} = req.body
+    const {name, email, password, pic} = req.body
     if(!email || !password || !name){
         return res.status(422).json({err: "please add all the fields"})
     }
@@ -20,7 +20,8 @@ router.post('/signup', (req, res) => {
                     const user = new User({
                         email,
                         password: hashedPassword,
-                        name
+                        name, 
+                        pic
                     })
                     user.save()
                     .then(user => {
@@ -37,19 +38,21 @@ router.post('/signin', (req, res) => {
 
     const {email, password} = req.body
 
+    console.log('email',email, password)
+
     if(!email || !password) return res.json({error: "please add email or password"})
 
     User.findOne({email})
     .then(savedUser => {
-        if(!savedUser) return res.json({error: "please add email or password"})
+        if(!savedUser) return res.json({error: "please add email"})
         bcryptjs.compare(password, savedUser.password)
         .then(doMatch => {
             if(doMatch){
                 const token = jwt.sign({_id: savedUser._id}, JWT_SECRET)
-                const {_id, name, email} = savedUser
-                return res.json({token, user: {_id, name, email}, message: "successfully signed in"})
+                const {_id, name, email, followers, following, pic} = savedUser
+                return res.json({token, user: {_id, name, email, followers, following, pic}, message: "successfully signed in"})
             }else{
-                return res.json({error: "please add email or password"})
+                return res.json({error: "please password"})
             }
         })
     })

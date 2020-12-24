@@ -23,13 +23,15 @@ require('./models/posts')
 
 const auth = require('./routes/auth')
 const post = require('./routes/post')
+const user = require('./routes/user')
 
 app.use(express.json())
 
 app.use(auth)
 app.use(post)
+app.use(user)
 
-mongoose.connect(MONGOURI, { useUnifiedTopology: true })
+mongoose.connect(MONGOURI)
 
 mongoose.connection.on('connected', () => {
     console.log("connected to mongo")
